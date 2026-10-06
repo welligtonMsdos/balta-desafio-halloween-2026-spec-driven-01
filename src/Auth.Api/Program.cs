@@ -1,4 +1,5 @@
 using Auth.Api.Errors;
+using Auth.Api.Authorization;
 using Auth.Application.Abstractions;
 using Auth.Application.Contracts;
 using Auth.Application.Services;
@@ -67,6 +68,16 @@ app.MapPost("/auth/login", async (LoginRequest request, IAuthService authService
     var token = await authService.LoginAsync(request, cancellationToken);
     return Results.Ok(new { accessToken = token.Value, tokenType = token.TokenType, expiresIn = token.ExpiresIn });
 });
+
+app.MapGet("/users/{userId:guid}", async (Guid userId, HttpContext context, UserService userService, CancellationToken cancellationToken) =>
+{
+    if (!UserOwnership.IsOwner(context.User, userId))
+    {
+        return Results.Forbid();
+    }
+
+    return Results.Ok(await userService.GetByIdAsync(userId, cancellationToken));
+}).RequireAuthorization();
 
 app.Run();
 
