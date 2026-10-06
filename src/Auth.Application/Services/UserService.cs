@@ -38,5 +38,16 @@ public sealed class UserService(
         return ToResponse(user);
     }
 
+    public async Task<PageResult<UserResponse>> ListAsync(int page, int pageSize, CancellationToken cancellationToken)
+    {
+        if (page < 1 || pageSize is < 1 or > 100)
+        {
+            throw new ArgumentException("Os parâmetros de paginação são inválidos.");
+        }
+
+        var users = await userRepository.ListAsync(page, pageSize, cancellationToken);
+        return new PageResult<UserResponse>(users.Items.Select(ToResponse).ToArray(), users.Page, users.PageSize, users.TotalCount);
+    }
+
     private static UserResponse ToResponse(User user) => new(user.Id, user.Email, user.CreatedAtUtc);
 }
