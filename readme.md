@@ -21,7 +21,10 @@ Neste desafio o objetivo é consolidar os fundamentos do Spec Driven Development
 - Dockerfile e Docker Compose para executar a API e o banco de dados.
 
 Neste processo eu aprendi:
-* ✅
+* ✅ Uma especificação mais detalhada deixa mais claro como elaborar o plano para executá-la.
+* ✅ Com a especificação e o plano bem definidos, as tarefas ficam mais claras e mostram melhor o que será produzido.
+* ✅ A IA executou corretamente todas as tarefas, criando um commit específico para cada uma e sem fazer nada além do que foi pedido.
+* ✅ Para mim, essa experiência foi surreal e incrível.
 
 ## Bagde
 <img src="https://baltaio.blob.core.windows.net/static/images/v4/challenges/halloween-2026/01.png" width="200" />
@@ -33,4 +36,46 @@ Neste processo eu aprendi:
 O desafio **Halloween 2026** consiste em implementar implementar o modelo Spec Driven Development de ponta a ponta, criando apps completas com IA.
 
 ### Veja meu progresso no desafio
-[Incluir link para o repositório central]
+[https://github.com/welligtonMsdos/balta-desafio-halloween-2026-spec-driven-01]
+
+## Como executar a API
+
+Você pode iniciar a API e o banco de dados juntos usando o Docker Compose. Antes de começar, confirme que o Docker Desktop está aberto e em execução.
+
+### 1. Abra o terminal na pasta do projeto
+
+Navegue até a pasta raiz do repositório, onde está o arquivo `docker-compose.yml`.
+
+### 2. Inicie a API e o banco de dados
+
+Execute:
+
+```powershell
+docker compose up --build --detach
+```
+
+O Docker irá construir a imagem da API, iniciar a API e aguardar o PostgreSQL ficar pronto. O banco usa armazenamento temporário; os dados são descartados quando o contêiner do banco é recriado.
+
+### 3. Confira se os serviços estão em execução
+
+```powershell
+docker compose ps
+```
+
+Quando os serviços estiverem prontos, a API poderá ser acessada localmente.
+
+### 4. Abra a documentação interativa
+
+Acesse no navegador:
+
+**[Abrir a API no Scalar](http://localhost:8080/scalar/v1)**
+
+Na página do Scalar você pode consultar os endpoints e experimentar as requisições da API.
+
+### Parar a API
+
+Quando terminar, pare e remova os contêineres com:
+
+```powershell
+docker compose down
+```
