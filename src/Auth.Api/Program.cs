@@ -35,6 +35,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
+        options.MapInboundClaims = false;
     });
 builder.Services.AddAuthorization();
 var connectionString = builder.Configuration.GetConnectionString("Postgres")
