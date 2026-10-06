@@ -95,6 +95,17 @@ app.MapPut("/users/{userId:guid}", async (Guid userId, UpdateUserRequest request
     return Results.Ok(await userService.UpdateAsync(userId, request, cancellationToken));
 }).RequireAuthorization();
 
+app.MapDelete("/users/{userId:guid}", async (Guid userId, HttpContext context, UserService userService, CancellationToken cancellationToken) =>
+{
+    if (!UserOwnership.IsOwner(context.User, userId))
+    {
+        return Results.Forbid();
+    }
+
+    await userService.DeleteAsync(userId, cancellationToken);
+    return Results.NoContent();
+}).RequireAuthorization();
+
 app.Run();
 
 public partial class Program;
