@@ -6,9 +6,8 @@ RUN dotnet publish src/Auth.Api/Auth.Api.csproj --configuration Release --no-res
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
-RUN adduser --disabled-password --gecos "" appuser
 COPY --from=build /app/publish .
-USER appuser
+USER $APP_UID
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
 ENTRYPOINT ["dotnet", "Auth.Api.dll"]
