@@ -1,7 +1,9 @@
 using Auth.Application.Abstractions;
 using Auth.Application.Contracts;
+using Auth.Application.Exceptions;
 using Auth.Domain.Users;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Auth.Infrastructure.Persistence;
 
@@ -35,5 +37,15 @@ public sealed class PostgresUserRepository(AuthDbContext dbContext) : IUserRepos
         return Task.CompletedTask;
     }
 
-    public Task SaveChangesAsync(CancellationToken cancellationToken) => dbContext.SaveChangesAsync(cancellationToken);
+    public async Task SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (PostgresException exception) when (exception.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            throw new ConflictException("O e-mail já está em uso.");
+        }
+    }
 }
