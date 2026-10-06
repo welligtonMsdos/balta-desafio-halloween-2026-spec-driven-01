@@ -49,5 +49,38 @@ public sealed class UserService(
         return new PageResult<UserResponse>(users.Items.Select(ToResponse).ToArray(), users.Page, users.PageSize, users.TotalCount);
     }
 
+    public async Task<UserResponse> UpdateAsync(Guid userId, UpdateUserRequest request, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) && string.IsNullOrWhiteSpace(request.Password))
+        {
+            throw new ArgumentException("Informe e-mail ou senha para atualização.");
+        }
+
+        var user = await userRepository.GetByIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Usuário não encontrado.");
+
+        if (!string.IsNullOrWhiteSpace(request.Email))
+        {
+            var email = EmailAddress.Create(request.Email);
+            var existingUser = await userRepository.GetByNormalizedEmailAsync(email.NormalizedValue, cancellationToken);
+            if (existingUser is not null && existingUser.Id != user.Id)
+            {
+                throw new ConflictException("O e-mail já está em uso.");
+            }
+
+            user.ChangeEmail(email.Value, email.NormalizedValue);
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            PasswordPolicy.EnsureValid(request.Password);
+            user.ChangePassword(passwordHasher.Hash(user, request.Password));
+        }
+
+        await userRepository.UpdateAsync(user, cancellationToken);
+        await userRepository.SaveChangesAsync(cancellationToken);
+        return ToResponse(user);
+    }
+
     private static UserResponse ToResponse(User user) => new(user.Id, user.Email, user.CreatedAtUtc);
 }
