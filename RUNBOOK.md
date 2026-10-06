@@ -11,7 +11,7 @@
 docker compose up --build
 ```
 
-A API fica disponível em `http://localhost:8080`. O PostgreSQL usa `tmpfs`, portanto nenhum dado é persistido após a remoção do contêiner.
+A API fica disponível em `http://localhost:8080` e a documentação interativa Scalar em `http://localhost:8080/scalar`. O PostgreSQL usa `tmpfs`, portanto nenhum dado é persistido após a remoção do contêiner.
 
 ## Executar testes
 
