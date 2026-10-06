@@ -61,6 +61,12 @@ app.MapPost("/auth/register", async (RegisterUserRequest request, UserService us
     return Results.Created($"/users/{user.Id}", user);
 });
 
+app.MapPost("/auth/login", async (LoginRequest request, IAuthService authService, CancellationToken cancellationToken) =>
+{
+    var token = await authService.LoginAsync(request, cancellationToken);
+    return Results.Ok(new { accessToken = token.Value, tokenType = token.TokenType, expiresIn = token.ExpiresIn });
+});
+
 app.Run();
 
 public partial class Program;
