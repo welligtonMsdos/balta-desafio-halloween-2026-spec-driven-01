@@ -1,6 +1,12 @@
 using Auth.Api.Errors;
+using Auth.Application.Abstractions;
+using Auth.Application.Contracts;
+using Auth.Application.Services;
+using Auth.Infrastructure;
+using Auth.Infrastructure.Persistence;
 using Auth.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -31,6 +37,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddAuthorization();
+var connectionString = builder.Configuration.GetConnectionString("Postgres")
+    ?? throw new InvalidOperationException("A connection string Postgres é obrigatória.");
+builder.Services.AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddScoped<IUserRepository, PostgresUserRepository>();
+builder.Services.AddSingleton<IClock, SystemClock>();
+builder.Services.AddSingleton<IPasswordHasher, AspNetPasswordHasher>();
+builder.Services.AddSingleton<ITokenService, JwtTokenService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
@@ -39,6 +54,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+
+app.MapPost("/auth/register", async (RegisterUserRequest request, UserService userService, CancellationToken cancellationToken) =>
+{
+    var user = await userService.RegisterAsync(request, cancellationToken);
+    return Results.Created($"/users/{user.Id}", user);
+});
 
 app.Run();
 

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Auth.Application.Exceptions;
 
 namespace Auth.Api.Errors;
 
@@ -17,6 +18,10 @@ public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : I
         {
             ArgumentException argumentException => (StatusCodes.Status400BadRequest,
                 new ApiError("validation_error", argumentException.Message)),
+            ConflictException conflictException => (StatusCodes.Status409Conflict,
+                new ApiError("conflict", conflictException.Message)),
+            InvalidCredentialsException => (StatusCodes.Status401Unauthorized,
+                new ApiError("invalid_credentials", "Credenciais inválidas.")),
             KeyNotFoundException => (StatusCodes.Status404NotFound,
                 new ApiError("not_found", "Recurso não encontrado.")),
             UnauthorizedAccessException => (StatusCodes.Status403Forbidden,
