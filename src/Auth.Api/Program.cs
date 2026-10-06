@@ -41,7 +41,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 var connectionString = builder.Configuration.GetConnectionString("Postgres")
     ?? throw new InvalidOperationException("A connection string Postgres é obrigatória.");
-builder.Services.AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<AuthDbContext>(options =>
+{
+    options.UseNpgsql(connectionString);
+    options.EnableSensitiveDataLogging(false);
+    options.EnableDetailedErrors(false);
+});
 builder.Services.AddScoped<IUserRepository, PostgresUserRepository>();
 builder.Services.AddSingleton<IClock, SystemClock>();
 builder.Services.AddSingleton<IPasswordHasher, AspNetPasswordHasher>();
