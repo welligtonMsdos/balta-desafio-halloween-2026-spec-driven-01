@@ -30,5 +30,13 @@ public sealed class UserService(
         return ToResponse(user);
     }
 
+    public async Task<UserResponse> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        var user = await userRepository.GetByIdAsync(userId, cancellationToken)
+            ?? throw new KeyNotFoundException("Usuário não encontrado.");
+
+        return ToResponse(user);
+    }
+
     private static UserResponse ToResponse(User user) => new(user.Id, user.Email, user.CreatedAtUtc);
 }
