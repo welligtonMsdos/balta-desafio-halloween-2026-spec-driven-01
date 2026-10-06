@@ -79,6 +79,12 @@ app.MapGet("/users/{userId:guid}", async (Guid userId, HttpContext context, User
     return Results.Ok(await userService.GetByIdAsync(userId, cancellationToken));
 }).RequireAuthorization();
 
+app.MapGet("/users", async (int? page, int? pageSize, UserService userService, CancellationToken cancellationToken) =>
+{
+    var users = await userService.ListAsync(page ?? 1, pageSize ?? 20, cancellationToken);
+    return Results.Ok(users);
+}).RequireAuthorization();
+
 app.Run();
 
 public partial class Program;
