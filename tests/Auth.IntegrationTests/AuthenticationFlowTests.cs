@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Auth.IntegrationTests;
@@ -25,7 +26,11 @@ public sealed class AuthenticationFlowTests : IClassFixture<WebApplicationFactor
 
         var login = await client.PostAsJsonAsync("/auth/login", new { email, password = "SenhaForte@2026" });
         Assert.Equal(HttpStatusCode.OK, login.StatusCode);
-        Assert.Contains("accessToken", await login.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        var payload = await login.Content.ReadFromJsonAsync<TokenResponse>();
+        Assert.NotNull(payload);
+        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(payload.AccessToken);
+        Assert.Equal(email, jwt.Claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Email).Value);
+        Assert.NotNull(jwt.Claims.SingleOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub));
     }
 
     [Fact]
@@ -40,4 +45,6 @@ public sealed class AuthenticationFlowTests : IClassFixture<WebApplicationFactor
         var response = await client.PostAsJsonAsync("/auth/login", new { email = "missing@example.com", password = "SenhaForte@2026" });
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
+
+    private sealed record TokenResponse(string AccessToken);
 }
