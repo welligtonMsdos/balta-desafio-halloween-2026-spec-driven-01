@@ -4,6 +4,7 @@
 
 - Linguagem e runtime: C# sobre .NET 10, com nullable reference types habilitado.
 - API: ASP.NET Core Minimal API para endpoints HTTP, autenticação JWT Bearer e tratamento centralizado de erros.
+- Documentação de API: OpenAPI e Scalar para documentação interativa dos endpoints em desenvolvimento e no Docker local.
 - Persistência: Entity Framework Core com o provedor Npgsql para PostgreSQL.
 - Segurança: `PasswordHasher<TUser>` do ASP.NET Core Identity para hash de senha com salt e JWT assinado com chave simétrica configurada por ambiente.
 - Banco de dados: PostgreSQL em contêiner Docker. O diretório `/var/lib/postgresql/data` deve usar `tmpfs`, sem volume persistente, tornando os dados efêmeros e mantidos na memória do contêiner.
@@ -44,6 +45,7 @@
 - O JWT deve conter os claims `sub`, `email`, `iss`, `aud`, `iat` e `exp`; emissor, audiência, chave e validade são configurações de ambiente. A inicialização deve falhar se a chave estiver ausente ou insegura.
 - O access token tem validade padrão de 60 minutos. Renovação, revogação, logout, MFA e provedores externos não fazem parte da implementação atual.
 - Endpoints de autenticação: `POST /auth/register` retorna `201 Created`; `POST /auth/login` retorna `200 OK` com `accessToken`, `tokenType` e `expiresIn`.
+- O Scalar deve estar disponível em `/scalar` quando a API for executada em desenvolvimento ou Docker local. A documentação OpenAPI deve descrever o esquema Bearer JWT e não pode conter qualquer segredo, senha, hash ou connection string real.
 - Endpoints do CRUD: `GET /users`, `GET /users/{id}`, `PUT /users/{id}` e `DELETE /users/{id}` exigem Bearer token. A listagem deve ser paginada e todos os contratos retornam somente campos públicos.
 - Status HTTP: dados inválidos retornam `400 Bad Request`; e-mail duplicado retorna `409 Conflict`; credenciais inválidas retornam `401 Unauthorized` com mensagem idêntica para e-mail inexistente ou senha incorreta; acesso a recurso de outro usuário retorna `403 Forbidden`; recurso inexistente retorna `404 Not Found`; exclusão bem-sucedida retorna `204 No Content`.
 - Datas devem ser armazenadas e manipuladas em UTC. Identificadores devem ser UUIDs.
@@ -59,6 +61,7 @@
 - Nenhuma tarefa pode ser considerada concluída sem atender aos seus critérios de aceite e sem os testes aplicáveis passando.
 - Alterações de schema devem ser feitas somente por migrações versionadas e revisadas; alterações manuais no banco não são parte do processo.
 - Alterações em contratos HTTP, regras de autenticação, política de senha, autorização ou modelo de dados exigem atualização coordenada de especificação, plano, tarefas, testes e documentação de uso.
+- Alterações em endpoints ou esquemas de autenticação exigem também a atualização e validação da documentação OpenAPI/Scalar.
 - Uma revisão não pode aprovar acesso direto a `DbContext` fora da infraestrutura, regra de negócio em endpoint ou uso de persistência sem repositório e serviço correspondente. Exceções exigem atualização explícita desta constituição antes da implementação.
 - O escopo não deve crescer silenciosamente. Funcionalidades como recuperação de senha, confirmação de e-mail, autenticação social, MFA, papéis administrativos, limitação de tentativas, revogação de token ou integração externa exigem nova especificação, plano e tarefas antes de implementação.
 - A conclusão do projeto exige executar a validação Docker definida na T-38 e documentar os comandos necessários para iniciar, testar e encerrar o ambiente efêmero.

@@ -36,6 +36,7 @@ O banco será a fonte de verdade para a unicidade. Além da verificação feita 
 - O CRUD usará `GET /users` para listagem paginada de dados públicos e `GET`, `PUT` e `DELETE /users/{id}` para operações individuais. Todos exigem JWT; as operações individuais são autorizadas somente quando o `sub` corresponde ao id de rota.
 - E-mail duplicado retornará `409 Conflict`. Entrada inválida retornará `400 Bad Request` com os campos e regras inválidas. Falha de login, seja por e-mail inexistente ou senha incorreta, retornará sempre `401 Unauthorized` com a mesma mensagem genérica. Recurso inexistente retornará `404 Not Found` e acesso à conta de outro usuário retornará `403 Forbidden`.
 - A imagem da API será gerada por Dockerfile multiestágio. O Compose aguardará a saúde do PostgreSQL antes de iniciar a API.
+- A API deve gerar um documento OpenAPI e usar Scalar como interface interativa de documentação. O Scalar será disponibilizado na rota `/scalar` no ambiente de desenvolvimento e no Docker local, sem incluir valores de segredos nos exemplos ou na configuração publicada.
 - Não serão usados serviços externos. Dependências de compilação serão pacotes versionados do ecossistema .NET restaurados no processo de build; em execução, a solução depende exclusivamente dos contêineres definidos no repositório.
 
 ## Modelo de dados
@@ -130,6 +131,10 @@ O e-mail informado é normalizado e precisa ser único; a nova senha precisa obe
 ### `DELETE /users/{id}`
 
 Exige `Authorization: Bearer <jwt>` e titularidade da conta. Remove o usuário e retorna `204 No Content`; retorna `403 Forbidden` para outro titular e `404 Not Found` quando o id não existe. Após a exclusão, o login com as credenciais removidas deve falhar.
+
+### Documentação interativa
+
+O documento OpenAPI será exposto pela API e o Scalar estará disponível em `/scalar`. A documentação deve declarar o esquema Bearer JWT para os endpoints protegidos, listar todos os contratos de autenticação e CRUD e nunca conter chaves, senhas, hashes ou connection strings reais.
 
 ### Testes e operação em Docker
 

@@ -48,6 +48,7 @@ O resultado esperado é uma base de usuários com e-mails únicos e senhas que a
 - RF-14: o sistema deve permitir que o titular autenticado atualize o e-mail e/ou a senha de sua própria conta.
 - RF-15: o sistema deve validar novamente a unicidade do e-mail e a política de senha forte sempre que esses dados forem alterados.
 - RF-16: o sistema deve permitir que o titular autenticado exclua sua própria conta.
+- RF-17: o sistema deve disponibilizar documentação interativa da API por meio do Scalar, permitindo consultar e executar os endpoints em ambiente de desenvolvimento.
 
 ## Regras de negócio
 
@@ -81,6 +82,7 @@ O resultado esperado é uma base de usuários com e-mails únicos e senhas que a
 - A atualização de senha que não atenda à política de senha forte deve ser recusada e não pode alterar o hash existente.
 - A consulta, atualização ou exclusão de um identificador inexistente deve retornar que o recurso não foi encontrado.
 - A listagem deve rejeitar paginação inválida e não pode incluir senha ou hash em nenhum item retornado.
+- A documentação interativa não pode expor valores reais de chaves JWT, connection strings, senhas ou hashes.
 
 ## Fora de escopo
 
@@ -105,3 +107,4 @@ O resultado esperado é uma base de usuários com e-mails únicos e senhas que a
 - Dado que estou autenticado como titular de uma conta, quando atualizo seu e-mail para um valor válido e único e/ou sua senha para um valor forte, então os dados são alterados; quando uso e-mail duplicado ou senha inválida, então nenhuma alteração é persistida.
 - Dado que estou autenticado como titular de uma conta, quando solicito sua exclusão, então a conta é removida e um novo login com suas credenciais falha.
 - Dado que estou autenticado como outro usuário, quando tento consultar, atualizar ou excluir uma conta que não é minha, então a operação é negada.
+- Dado que a API está em execução no ambiente de desenvolvimento, quando acesso a rota da documentação, então o Scalar exibe os contratos OpenAPI e permite testar os endpoints sem expor segredos.
