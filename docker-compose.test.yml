@@ -1,0 +1,27 @@
+services:
+  postgres-test:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: auth_test
+      POSTGRES_USER: auth
+      POSTGRES_PASSWORD: auth
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth -d auth_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    environment:
+      ConnectionStrings__Postgres: Host=postgres-test;Port=5432;Database=auth_test;Username=auth;Password=auth
+      Jwt__Issuer: auth-api
+      Jwt__Audience: auth-api-clients
+      Jwt__Key: test-only-jwt-key-with-at-least-32-bytes
+    depends_on:
+      postgres-test:
+        condition: service_healthy
