@@ -60,6 +60,12 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
+
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 
 app.MapPost("/auth/register", async (RegisterUserRequest request, UserService userService, CancellationToken cancellationToken) =>
