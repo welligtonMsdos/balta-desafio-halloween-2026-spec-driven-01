@@ -85,6 +85,16 @@ app.MapGet("/users", async (int? page, int? pageSize, UserService userService, C
     return Results.Ok(users);
 }).RequireAuthorization();
 
+app.MapPut("/users/{userId:guid}", async (Guid userId, UpdateUserRequest request, HttpContext context, UserService userService, CancellationToken cancellationToken) =>
+{
+    if (!UserOwnership.IsOwner(context.User, userId))
+    {
+        return Results.Forbid();
+    }
+
+    return Results.Ok(await userService.UpdateAsync(userId, request, cancellationToken));
+}).RequireAuthorization();
+
 app.Run();
 
 public partial class Program;
